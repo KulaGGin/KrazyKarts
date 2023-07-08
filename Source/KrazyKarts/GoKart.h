@@ -24,7 +24,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	FVector GetResistance();
+	FVector GetAirResistance();
+	FVector GetRollingResistance();
 	void ApplyRotation(float DeltaTime);
 	void UpdateLocationFromVelocity(float DeltaTime);
 
@@ -40,8 +41,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MaxDegreesPerSecond = 90;
 
+	// Higher means more drag
 	UPROPERTY(EditAnywhere)
 	float DragCoefficient = 16;
+
+	// Higher means more rolling resistance
+	UPROPERTY(EditAnywhere)
+	float RollingResistanceCoefficient = 0.015;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
