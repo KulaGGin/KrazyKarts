@@ -15,22 +15,22 @@ public:
 	// Sets default values for this pawn's properties
 	AGoKart();
 
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+private:
+	FVector GetResistance();
 	void ApplyRotation(float DeltaTime);
 	void UpdateLocationFromVelocity(float DeltaTime);
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-private:
 	// The mass of the car(kg)
 	UPROPERTY(EditAnywhere)
-	float Mass = 1000;;
+	float Mass = 1000;
 
 	// The force applied to the car when the throttle is fully down(N).
 	UPROPERTY(EditAnywhere)
@@ -39,6 +39,9 @@ private:
 	// The number of degrees rotated per second at full control throw (degrees/s).
 	UPROPERTY(EditAnywhere)
 	float MaxDegreesPerSecond = 90;
+
+	UPROPERTY(EditAnywhere)
+	float DragCoefficient = 16;
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
