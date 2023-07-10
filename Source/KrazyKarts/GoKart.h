@@ -6,6 +6,36 @@
 #include "GameFramework/Pawn.h"
 #include "GoKart.generated.h"
 
+USTRUCT()
+struct FGoKartMove {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	float Throttle;
+	UPROPERTY()
+	float SteeringThrow;
+
+	UPROPERTY()
+	float DeltaTime;
+
+	UPROPERTY()
+	float Time;
+};
+
+USTRUCT()
+struct FGoKartState {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+	FTransform Transform;
+
+	UPROPERTY()
+	FVector Velocity;
+
+	UPROPERTY()
+	FGoKartMove LastMove;
+};
+
 UCLASS()
 class KRAZYKARTS_API AGoKart : public APawn
 {
@@ -22,23 +52,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 private:
-	FString GetEnumText(ENetRole NetRole) {
-		switch(NetRole) {
-		case ROLE_None:
-			return "None";
-		case ROLE_SimulatedProxy: 
-			return "SimulatedProxy";
-		case ROLE_AutonomousProxy: 
-			return "AutonomousProxy";
-		case ROLE_Authority:
-			return "Authority";
-		default:
-			return "Error";;
-		}
-	}
+	void SimulateMove(const FGoKartMove& Move);
+	FGoKartMove CreateMove(float DeltaTime);
+
+	FString GetEnumText(ENetRole NetRole);
 	FVector GetAirResistance();
 	FVector GetRollingResistance();
-	void ApplyRotation(float DeltaTime);
+	void ApplyRotation(float DeltaTime, float SteeringThrowParameter);
 	void UpdateLocationFromVelocity(float DeltaTime);
 
 
@@ -66,26 +86,21 @@ private:
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
-	void Local_MoveForward(float Value);
-	void Local_MoveRight(float Value);
-
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveForward(float Value);
+	void Server_SendMove(FGoKartMove Move);
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_MoveRight(float Value);
+	UPROPERTY(ReplicatedUsing = OnRep_ServerState)
+	FGoKartState ServerState;
 
-	UPROPERTY(Replicated)
 	FVector Velocity;
 
-	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedFTransform)
-	FTransform ReplicatedTransform;
-
 	UFUNCTION()
-	void OnRep_ReplicatedFTransform();
+	void OnRep_ServerState();
 
-	UPROPERTY(Replicated)
+	void ClearAcknowledgedMoves(FGoKartMove& LastAcknowledgedMove);
+	
 	float Throttle;
-	UPROPERTY(Replicated)
 	float SteeringThrow;
+
+	TArray<FGoKartMove> UnacknowledgedMoves;
 };
