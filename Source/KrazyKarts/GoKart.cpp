@@ -40,6 +40,9 @@ void AGoKart::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGoKart, ReplicatedTransform);
+	DOREPLIFETIME(AGoKart, Velocity);
+	DOREPLIFETIME(AGoKart, Throttle);
+	DOREPLIFETIME(AGoKart, SteeringThrow);
 }
 
 // Called every frame
@@ -60,9 +63,14 @@ void AGoKart::Tick(float DeltaTime)
 
 	DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(GetLocalRole()), this, FColor::White, DeltaTime);
 
-	if(HasAuthority()) {
+	if(HasAuthority())
+	{
 		ReplicatedTransform = GetActorTransform();
 	}
+}
+
+void AGoKart::OnRep_ReplicatedFTransform() {
+	SetActorTransform(ReplicatedTransform);
 }
 
 FVector AGoKart::GetAirResistance() {
@@ -116,10 +124,6 @@ void AGoKart::Local_MoveForward(float Value) {
 
 void AGoKart::Local_MoveRight(float Value) {
 	SteeringThrow = Value;
-}
-
-void AGoKart::OnRep_ReplicatedFTransform() {
-	SetActorTransform(ReplicatedTransform);
 }
 
 void AGoKart::Server_MoveForward_Implementation(float Value) {
