@@ -19,11 +19,24 @@ public:
 	virtual void BeginPlay() override;
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	FString GetEnumText(ENetRole NetRole) {
+		switch(NetRole) {
+		case ROLE_None:
+			return "None";
+		case ROLE_SimulatedProxy: 
+			return "SimulatedProxy";
+		case ROLE_AutonomousProxy: 
+			return "AutonomousProxy";
+		case ROLE_Authority:
+			return "Authority";
+		default:
+			return "Error";;
+		}
+	}
 	FVector GetAirResistance();
 	FVector GetRollingResistance();
 	void ApplyRotation(float DeltaTime);
@@ -51,6 +64,15 @@ private:
 
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
+	void Local_MoveForward(float Value);
+	void Local_MoveRight(float Value);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_MoveForward(float Value);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_MoveRight(float Value);
 
 	FVector Velocity;
 

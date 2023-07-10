@@ -2,6 +2,8 @@
 
 
 #include "GoKart.h"
+
+#include "DrawDebugHelpers.h"
 #include "Components/InputComponent.h"
 
 #include "Engine/World.h"
@@ -21,6 +23,14 @@ void AGoKart::BeginPlay()
 	
 }
 
+// Called to bind functionality to input
+void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAxis("MoveForward", this, &AGoKart::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::MoveRight);
+}
+
 // Called every frame
 void AGoKart::Tick(float DeltaTime)
 {
@@ -36,6 +46,8 @@ void AGoKart::Tick(float DeltaTime)
 	ApplyRotation(DeltaTime);
 
 	UpdateLocationFromVelocity(DeltaTime);
+
+	DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(GetLocalRole()), this, FColor::White, DeltaTime);
 }
 
 FVector AGoKart::GetAirResistance() {
@@ -73,19 +85,37 @@ void AGoKart::UpdateLocationFromVelocity(float DeltaTime) {
 		Velocity = {};
 }
 
-// Called to bind functionality to input
-void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("MoveForward", this, &AGoKart::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::MoveRight);
-}
-
 void AGoKart::MoveForward(float Value) {
-	Throttle = Value;
+	Local_MoveForward(Value);
+	Server_MoveForward(Value);
 }
 
 void AGoKart::MoveRight(float Value) {
+	Local_MoveRight(Value);
+	Server_MoveRight(Value);
+}
+
+void AGoKart::Local_MoveForward(float Value) {
+	Throttle = Value;
+}
+
+void AGoKart::Local_MoveRight(float Value) {
 	SteeringThrow = Value;
+}
+
+void AGoKart::Server_MoveForward_Implementation(float Value) {
+	Local_MoveForward(Value);
+}
+
+bool AGoKart::Server_MoveForward_Validate(float Value) {
+	return FMath::Abs(Value) <= 1.f;
+}
+
+void AGoKart::Server_MoveRight_Implementation(float Value) {
+	Local_MoveRight(Value);
+}
+
+bool AGoKart::Server_MoveRight_Validate(float Value) {
+	return FMath::Abs(Value) <= 1.f;
 }
 
