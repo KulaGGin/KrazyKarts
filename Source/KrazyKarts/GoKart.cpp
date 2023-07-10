@@ -7,12 +7,15 @@
 #include "Components/InputComponent.h"
 
 #include "Engine/World.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AGoKart::AGoKart()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
 
 }
 
@@ -29,6 +32,14 @@ void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGoKart::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::MoveRight);
+}
+
+void AGoKart::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGoKart, ReplicatedLocation);
+	DOREPLIFETIME(AGoKart, ReplicatedRotation);
 }
 
 // Called every frame
@@ -48,6 +59,15 @@ void AGoKart::Tick(float DeltaTime)
 	UpdateLocationFromVelocity(DeltaTime);
 
 	DrawDebugString(GetWorld(), FVector(0, 0, 100), GetEnumText(GetLocalRole()), this, FColor::White, DeltaTime);
+
+	if(HasAuthority()) {
+		ReplicatedLocation = GetActorLocation();
+		ReplicatedRotation = GetActorRotation();
+	}
+	else {
+		SetActorLocation(ReplicatedLocation);
+		SetActorRotation(ReplicatedRotation);
+	}
 }
 
 FVector AGoKart::GetAirResistance() {
@@ -118,4 +138,3 @@ void AGoKart::Server_MoveRight_Implementation(float Value) {
 bool AGoKart::Server_MoveRight_Validate(float Value) {
 	return FMath::Abs(Value) <= 1.f;
 }
-

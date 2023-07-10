@@ -21,7 +21,6 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 private:
 	FString GetEnumText(ENetRole NetRole) {
 		switch(NetRole) {
@@ -41,6 +40,8 @@ private:
 	FVector GetRollingResistance();
 	void ApplyRotation(float DeltaTime);
 	void UpdateLocationFromVelocity(float DeltaTime);
+
+
 
 	// The mass of the car(kg)
 	UPROPERTY(EditAnywhere)
@@ -75,6 +76,12 @@ private:
 	void Server_MoveRight(float Value);
 
 	FVector Velocity;
+
+	UPROPERTY(Replicated)
+	FVector ReplicatedLocation;
+
+	UPROPERTY(Replicated)
+	FRotator ReplicatedRotation;
 
 	float Throttle;
 	float SteeringThrow;
