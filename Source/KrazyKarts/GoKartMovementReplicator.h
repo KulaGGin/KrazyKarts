@@ -31,6 +31,7 @@ public:
 	UGoKartMovementReplicator();
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void UpdateServerState(const FGoKartMove& Move);
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

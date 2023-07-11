@@ -54,6 +54,8 @@ public:
 	void SetSteeringThrow(float NewSteeringThrow);
 	float GetSteeringThrow();
 
+	FGoKartMove GetLastMove();
+
 
 	// The mass of the car(kg)
 	UPROPERTY(EditAnywhere)
@@ -79,4 +81,6 @@ public:
 
 	float Throttle;
 	float SteeringThrow;
+
+	FGoKartMove LastMove;
 };
