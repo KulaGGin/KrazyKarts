@@ -7,19 +7,25 @@
 #include "GoKartMovementComponent.generated.h"
 
 USTRUCT()
-struct FGoKartMove {
+struct FGoKartMove
+{
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY()
-		float Throttle;
 	UPROPERTY()
-		float SteeringThrow;
+	float Throttle;
+	UPROPERTY()
+	float SteeringThrow;
 
 	UPROPERTY()
-		float DeltaTime;
+	float DeltaTime;
 
 	UPROPERTY()
-		float Time;
+	float Time;
+
+	bool IsValid()
+	{
+		return FMath::Abs(Throttle) <= 1.f && FMath::Abs(SteeringThrow) <= 1.f;
+	}
 };
 
 

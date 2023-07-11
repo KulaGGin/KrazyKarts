@@ -81,6 +81,8 @@ public:
 	FTransform ClientStartTransform;
 	FVector ClientStartVelocity;
 
+	float ClientSimulatedTime;
+
 	UPROPERTY()
 	USceneComponent* MeshOffsetRoot;
 
