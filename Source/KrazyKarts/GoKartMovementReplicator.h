@@ -59,4 +59,5 @@ public:
 	float ClientTimeSinceUpdate;
 	float ClientTimeTimeBetweenLastUpdates;
 	FTransform ClientStartTransform;
+	FVector ClientStartVelocity;
 };
