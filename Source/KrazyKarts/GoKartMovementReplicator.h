@@ -8,7 +8,8 @@
 #include "GoKartMovementReplicator.generated.h"
 
 USTRUCT()
-struct FGoKartState {
+struct FGoKartState
+{
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY()
@@ -21,13 +22,27 @@ struct FGoKartState {
 	FGoKartMove LastMove;
 };
 
+struct FHermiteCubicSpline
+{
+	FVector StartLocation, StartDerivative, TargetLocation, TargeDerivative;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+	FVector InterpolateLocation(float LerpRatio) const
+	{
+		return FMath::CubicInterp(StartLocation, StartDerivative, TargetLocation, TargeDerivative, LerpRatio);
+	}
+
+	FVector InterpolateDerivative(float LerpRatio) const
+	{
+		return FMath::CubicInterpDerivative(StartLocation, StartDerivative, TargetLocation, TargeDerivative, LerpRatio);
+	}
+};
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class KRAZYKARTS_API UGoKartMovementReplicator : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	UGoKartMovementReplicator();
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -35,8 +50,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void UpdateServerState(const FGoKartMove& Move);
+	void InterpolateLocation(const FHermiteCubicSpline& Spline, float LerpRatio);
+	void InterpolateVelocity(const FHermiteCubicSpline& Spline, float LerpRatio);
+	void InterpolateRotation(float LerpRatio);
 
 	void ClientTick(float DeltaTime);
+	FHermiteCubicSpline CreateSpline();
+	float GetVelocityToDerivative();
 
 	void ClearAcknowledgedMoves(FGoKartMove& LastAcknowledgedMove);
 
