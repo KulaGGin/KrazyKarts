@@ -24,10 +24,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UGoKartMovementComponent* MovementComponent;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UGoKartMovementReplicator* MovementReplicator;
 
 	FString GetEnumText(ENetRole NetRole);
